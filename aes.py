@@ -312,17 +312,16 @@ class AES(object):
         return state
 
     # encrypts a 128 bit input block against the given key of size specified
-    def encrypt(self, iput, key, size):
+    def encrypt(self, iput, key, size, nbrRounds=None):
         output = [0] * 16
-        # the number of rounds
-        nbrRounds = 0
         # the 128 bit block to encode
         block = [0] * 16
         # set the number of rounds
-        if size == self.keySize["SIZE_128"]: nbrRounds = 10
-        elif size == self.keySize["SIZE_192"]: nbrRounds = 12
-        elif size == self.keySize["SIZE_256"]: nbrRounds = 14
-        else: return None
+        if not nbrRounds:
+            if size == self.keySize["SIZE_128"]: nbrRounds = 10
+            elif size == self.keySize["SIZE_192"]: nbrRounds = 12
+            elif size == self.keySize["SIZE_256"]: nbrRounds = 14
+            else: return None
 
         # the expanded keySize
         expandedKeySize = 16*(nbrRounds+1)
@@ -427,7 +426,7 @@ class AESModeOfOperation(object):
     # hexKey - a hex key of the bit length size
     # size - the bit length of the key
     # hexIV - the 128 bit hex Initilization Vector
-    def encrypt(self, stringIn, mode, key, size, IV):
+    def encrypt(self, stringIn, mode, key, size, IV, nbrRounds):
         if len(key) % size:
             return None
         if len(IV) % 16:
@@ -451,10 +450,10 @@ class AESModeOfOperation(object):
                 # print 'PT@%s:%s' % (j, plaintext)
                 if mode == self.modeOfOperation["CFB"]:
                     if firstRound:
-                        output = self.aes.encrypt(IV, key, size)
+                        output = self.aes.encrypt(IV, key, size, nbrRounds)
                         firstRound = False
                     else:
-                        output = self.aes.encrypt(iput, key, size)
+                        output = self.aes.encrypt(iput, key, size, nbrRounds)
                     for i in range(16):
                         if len(plaintext)-1 < i:
                             ciphertext[i] = 0 ^ output[i]
@@ -469,10 +468,10 @@ class AESModeOfOperation(object):
                     iput = ciphertext
                 elif mode == self.modeOfOperation["OFB"]:
                     if firstRound:
-                        output = self.aes.encrypt(IV, key, size)
+                        output = self.aes.encrypt(IV, key, size, nbrRounds)
                         firstRound = False
                     else:
-                        output = self.aes.encrypt(iput, key, size)
+                        output = self.aes.encrypt(iput, key, size, nbrRounds)
                     for i in range(16):
                         if len(plaintext)-1 < i:
                             ciphertext[i] = 0 ^ output[i]
@@ -493,7 +492,7 @@ class AESModeOfOperation(object):
                             iput[i] =  plaintext[i] ^ ciphertext[i]
                     # print 'IP@%s:%s' % (j, iput)
                     firstRound = False
-                    ciphertext = self.aes.encrypt(iput, key, size)
+                    ciphertext = self.aes.encrypt(iput, key, size, nbrRounds)
                     # always 16 bytes because of the padding for CBC
                     for k in range(16):
                         cipherOut.append(ciphertext[k])
@@ -596,7 +595,7 @@ def strip_PKCS7_padding(s):
         raise ValueError("String ending with %r can't be PCKS7-padded" % s[-1])
     return s[:-numpads]
 
-def encryptData(key, data, mode=AESModeOfOperation.modeOfOperation["CBC"]):
+def encryptData(key, data, mode=AESModeOfOperation.modeOfOperation["CBC"], nbrRounds):
     """encrypt `data` using `key`
 
     `key` should be a string of bytes.
@@ -613,7 +612,7 @@ def encryptData(key, data, mode=AESModeOfOperation.modeOfOperation["CBC"]):
     # create a new iv using random data
     iv = [ord(i) for i in os.urandom(16)]
     moo = AESModeOfOperation()
-    (mode, length, ciph) = moo.encrypt(data, mode, key, keysize, iv)
+    (mode, length, ciph) = moo.encrypt(data, mode, key, keysize, iv, nbrRounds)
     # With padding, the original length does not need to be known. It's a bad
     # idea to store the original message length.
     # prepend the iv.
@@ -656,7 +655,7 @@ def testStr(cleartext, keysize=16, modeName = "CBC"):
     key =  generateRandomKey(keysize)
     print 'Key:', [ord(x) for x in key]
     mode = AESModeOfOperation.modeOfOperation[modeName]
-    cipher = encryptData(key, cleartext, mode)
+    cipher = encryptData(key, cleartext, mode, 10)
     print 'Cipher:', [ord(x) for x in cipher]
     decr = decryptData(key, cipher, mode)
     print 'Decrypted:', decr
