@@ -595,7 +595,7 @@ def strip_PKCS7_padding(s):
         raise ValueError("String ending with %r can't be PCKS7-padded" % s[-1])
     return s[:-numpads]
 
-def encryptData(key, data, mode=AESModeOfOperation.modeOfOperation["CBC"], nbrRounds):
+def encryptData(key, data, mode=AESModeOfOperation.modeOfOperation["CBC"], nbrRounds=10):
     """encrypt `data` using `key`
 
     `key` should be a string of bytes.
