@@ -317,11 +317,11 @@ class AES(object):
         # the 128 bit block to encode
         block = [0] * 16
         # set the number of rounds
-        if not nbrRounds:
-            if size == self.keySize["SIZE_128"]: nbrRounds = 10
-            elif size == self.keySize["SIZE_192"]: nbrRounds = 12
-            elif size == self.keySize["SIZE_256"]: nbrRounds = 14
-            else: return None
+        # if not nbrRounds:
+        #     if size == self.keySize["SIZE_128"]: nbrRounds = 10
+        #     elif size == self.keySize["SIZE_192"]: nbrRounds = 12
+        #     elif size == self.keySize["SIZE_256"]: nbrRounds = 14
+        #     else: return None
 
         # the expanded keySize
         expandedKeySize = 16*(nbrRounds+1)
