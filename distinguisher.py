@@ -33,5 +33,5 @@ def Frandom(q):
 
 def testRandom(r, numTrials):
 	X = [F(r, random.randint(0, 15), random.randint(0, 15)) for i in xrange(numTrials)]
-	Y = [Frandom(r, random.randint(0, 15)) for i in xrange(numTrials)]
+	Y = [Frandom(random.randint(0, 15)) for i in xrange(numTrials)]
 	return X, Y, distinguish(X, Y)
