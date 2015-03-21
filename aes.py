@@ -284,16 +284,24 @@ class AES(object):
     # Perform the initial operations, the standard round, and the final
     # operations of the forward aes, creating a round key for each round
     def aes_main(self, state, expandedKey, nbrRounds):
-        state = self.addRoundKey(state, self.createRoundKey(expandedKey, 0))
+        #print "Initial state:", state
+        rk = self.createRoundKey(expandedKey, 0)
+        #print "Round key:", rk
+        state = self.addRoundKey(state, rk)
+        #print "After adding round key:", state
         i = 1
         while i < nbrRounds:
             state = self.aes_round(state,
                                    self.createRoundKey(expandedKey, 16*i))
             i += 1
+        #print "After intermediate rounds:", state
         state = self.subBytes(state, False)
+        #print "After subbing bytes:", state
         state = self.shiftRows(state, False)
+        #print "After shifting rows:", state
         state = self.addRoundKey(state,
                                  self.createRoundKey(expandedKey, 16*nbrRounds))
+        #print "After adding round key:", state
         return state
 
     # Perform the initial operations, the standard round, and the final

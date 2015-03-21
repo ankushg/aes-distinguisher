@@ -1,6 +1,7 @@
 
 import scipy.stats
 import aes
+import random
 
 def distinguish(x, y):
 	# x, y = lists of data points
@@ -22,6 +23,15 @@ def F(r, p, q):
 def test(r, numTrials):
 	# r = rounds
 	# numTrials = number of times to run F
-	X = [F(r, 3, 10) for i in xrange(numTrials)]
-	Y = [F(10, 3, 10) for i in xrange(numTrials)]
+	X = [F(r, random.randint(0, 16), random.randint(0, 16)) for i in xrange(numTrials)]
+	Y = [F(10, random.randint(0, 16), random.randint(0, 16)) for i in xrange(numTrials)]
+	return X, Y, distinguish(X, Y)
+
+def Frandom(r, q):
+	M = [aes.generateRandomKey(16) for i in xrange(2**8)]
+	return len(set([m[q] for m in M]))
+
+def testRandom(r, numTrials):
+	X = [F(r, random.randint(0, 15), random.randint(0, 15)) for i in xrange(numTrials)]
+	Y = [Frandom(r, random.randint(0, 15)) for i in xrange(numTrials)]
 	return X, Y, distinguish(X, Y)
