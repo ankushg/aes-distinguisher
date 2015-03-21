@@ -27,7 +27,7 @@ def test(r, numTrials):
 	Y = [F(10, random.randint(0, 16), random.randint(0, 16)) for i in xrange(numTrials)]
 	return X, Y, distinguish(X, Y)
 
-def Frandom(r, q):
+def Frandom(q):
 	M = [aes.generateRandomKey(16) for i in xrange(2**8)]
 	return len(set([m[q] for m in M]))
 
