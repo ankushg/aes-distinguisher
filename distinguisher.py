@@ -16,7 +16,7 @@ def F(r, p, q):
 	# returns number of different values of q
 	M = aes.generateRandomKey(16)
 	S = [M[:p] + byte + M[p+1:] for byte in [chr(i) for i in xrange(2**8)]]
-	K = aes.generateRandomKey(16)
+	K = aes.generateRandomK	ey(16)
 	T = [aes.encryptData(K, s, nbrRounds=r) for s in S]
 	return len(set([t[q] for t in T]))
 
@@ -25,6 +25,24 @@ def test(r, numTrials):
 	# numTrials = number of times to run F
 	X = [F(r, random.randint(0, 16), random.randint(0, 16)) for i in xrange(numTrials)]
 	Y = [F(10, random.randint(0, 16), random.randint(0, 16)) for i in xrange(numTrials)]
+	return X, Y, distinguish(X, Y)
+
+def alt_test(r, numTrials):
+	# r = rounds
+	# numTrials = number of times to run F
+	X = []
+	Y = []
+	for i in xrange(numTrials):
+		M = aes.generateRandomKey(16)
+		S = [M[:p] + byte + M[p+1:] for byte in [chr(i) for i in xrange(2**8)]]
+		K = aes.generateRandomKey(16)
+
+		T_r = [aes.encryptData(K, s, nbrRounds=r) for s in S]
+		T_10 = [aes.encryptData(K, s, nbrRounds=10) for s in S]
+		F_r = len(set([t[q] for t in T_r]))
+		F_10 = len(set([t[q] for t in T_10]))
+		X.append(F_r)
+		Y.append(F_10)
 	return X, Y, distinguish(X, Y)
 
 def Frandom(q):
