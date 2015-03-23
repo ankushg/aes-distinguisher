@@ -32,6 +32,8 @@ def alt_test(r, numTrials):
 	# numTrials = number of times to run F
 	X = []
 	Y = []
+	p = 3
+	q = 10
 	for i in xrange(numTrials):
 		M = aes.generateRandomKey(16)
 		S = [M[:p] + byte + M[p+1:] for byte in [chr(i) for i in xrange(2**8)]]
